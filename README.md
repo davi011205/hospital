@@ -16,7 +16,7 @@ Este projeto implementa, em Linguagem C, um sistema de cadastro e controle de pa
 2. Paciente
 3. Consulta
 
-4. 🧰 Funcionalidades
+🧰 Funcionalidades
 
 Para médico, paciente e consulta, o sistema permite:
 
