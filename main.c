@@ -12,6 +12,7 @@ typedef struct Medico {
 } Medico;
 
 void incluir_medico(Medico **Medico, int *tamMedico, int *idMedico);
+void pesquisar_medico(Medico *Medico, int tamMedico);
 
 int main() {
     int opcao;
@@ -80,7 +81,7 @@ int main() {
                        excluir_medico();
                         break;
                     case 4:
-                       pesquisar_medico();
+                        pesquisar_medico(medico, tamMedico);
                         break;
                     case 5:
                         break;
@@ -112,7 +113,7 @@ int main() {
 
 int subMenu(char str[]) {
     int subOpcao;
-    printf("--- O que deseja fazer ---\n", str);
+    printf("--- %s - O que deseja fazer ---\n", str);
     printf("1 - Incluir %s\n", str);
     printf("2 - Alterar %s\n", str);
     printf("3 - Excluir %s\n", str);
@@ -135,8 +136,8 @@ int subMenuRelatorios() {
     return subOpcao;
 }
 
-void incluir_medico(Medico **medico, int *tam, int *idMedico) {
-    Medico *temp = realloc(*medico, (*tam + 1) * sizeof(Medico));
+void incluir_medico(Medico **medico, int *tamMedico, int *idMedico) {
+    Medico *temp = realloc(*medico, (*tamMedico + 1) * sizeof(Medico));
     if(temp == NULL) {
         printf("nao foi possivel incluir o medico, tente novamente.\n");
         return;
@@ -144,16 +145,44 @@ void incluir_medico(Medico **medico, int *tam, int *idMedico) {
     *medico = temp;
 
     (*idMedico)++;
-    (*medico)[*tam].ID = *idMedico;
+    (*medico)[*tamMedico].ID = *idMedico;
 
     printf("digite o nome do medico: ");
-    fgets( (*medico)[*tam].nome, 55, stdin);
-    (*medico)[*tam].nome[strcspn((*medico)[*tam].nome, "\n")] = '\0';
+    fgets((*medico)[*tamMedico].nome, 55, stdin);
+    (*medico)[*tamMedico].nome[strcspn((*medico)[*tamMedico].nome, "\n")] = '\0';
 
     printf("digite a especialidade do medico: ");
-    fgets( (*medico)[*tam].especialidade, 55, stdin);
-    (*medico)[*tam].especialidade[strcspn((*medico)[*tam].especialidade, "\n")] = '\0';
+    fgets((*medico)[*tamMedico].especialidade, 55, stdin);
+    (*medico)[*tamMedico].especialidade[strcspn((*medico)[*tamMedico].especialidade, "\n")] = '\0';
 
-    (*tam)++;
+    (*tamMedico)++;
     printf("medico incluido com sucesso !\n");
+}
+
+void pesquisar_medico(Medico *medico, int tamMedico) {
+    char nome[55];
+    int achado = 0;
+    if(tamMedico == 0) {
+        printf("nao ha medicos cadastrados.\n");
+        return;
+    }
+
+    printf("digite o nome do medico: ");
+    fgets(nome, 55, stdin);
+    nome[strcspn(nome, "\n")] = '\0';
+
+    for(int i = 0; i < tamMedico; i++) {
+        if(!strcmp(medico->nome, nome)) {
+            achado = 1;
+            printf("medico %d encontrado(a):\n", i);
+            printf("id: %d\n", medico[i].ID);
+            printf("nome: %s\n", medico[i].nome);
+            printf("especialidade: %s\n", medico[i].especialidade);
+        }
+    }
+
+    if(!achado) {
+        printf("nao ha nenhum(a) medico(a) com esse nome\n");
+    }
+
 }
