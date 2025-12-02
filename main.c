@@ -6,13 +6,17 @@ int subMenu();
 int subMenuRelatorios();
 
 typedef struct Medico {
-    int Id;
-    char nome[50];
-    char especialidade[50];
+    int ID;
+    char nome[55];
+    char especialidade[55];
 } Medico;
+
+void incluir_medico(Medico **Medico, int *tamMedico, int *idMedico);
 
 int main() {
     int opcao;
+    Medico *medico = NULL;
+    int tamMedico = 0, idMedico = 0;
 
     do {
         printf("--- BEM VINDO AO SISTEMA HOSPITALAR ---\n");
@@ -67,7 +71,7 @@ int main() {
             case 3:
                 switch (subMenu("Medico")) {
                     case 1:
-                       incluir_medico();
+                       incluir_medico(&medico, &tamMedico, &idMedico);
                         break;
                     case 2:
                        alterar_medico();
@@ -129,4 +133,27 @@ int subMenuRelatorios() {
     printf("digite a opcao desejada: ");
     scanf("%d", &subOpcao);
     return subOpcao;
+}
+
+void incluir_medico(Medico **medico, int *tam, int *idMedico) {
+    Medico *temp = realloc(*medico, (*tam + 1) * sizeof(Medico));
+    if(temp == NULL) {
+        printf("nao foi possivel incluir o medico, tente novamente.\n");
+        return;
+    }
+    *medico = temp;
+
+    (*idMedico)++;
+    (*medico)[*tam].ID = *idMedico;
+
+    printf("digite o nome do medico: ");
+    fgets( (*medico)[*tam].nome, 55, stdin);
+    (*medico)[*tam].nome[strcspn((*medico)[*tam].nome, "\n")] = '\0';
+
+    printf("digite a especialidade do medico: ");
+    fgets( (*medico)[*tam].especialidade, 55, stdin);
+    (*medico)[*tam].especialidade[strcspn((*medico)[*tam].especialidade, "\n")] = '\0';
+
+    (*tam)++;
+    printf("medico incluido com sucesso !\n");
 }
