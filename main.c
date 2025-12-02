@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-int subMenu();
+int subMenu(char str[]);
 int subMenuRelatorios();
 
 typedef struct Medico {
