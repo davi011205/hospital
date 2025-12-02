@@ -34,75 +34,91 @@ int main() {
         
         switch(opcao) {
             case 1:
-                switch (subMenu("Consulta")) {
-                    case 1:
-                       incluir_consulta();
-                        break;
-                    case 2:
-                       alterar_consulta();
-                        break;
-                    case 3:
-                       excluir_consulta();
-                        break;
-                    case 4:
-                       pesquisar_consulta();
-                        break;
-                    case 5:
-                    break;
+                int loop = 1;
+                while (loop) {
+                    switch (subMenu("Consulta")) {
+                        case 1:
+                            incluir_consulta();
+                            break;
+                        case 2:
+                            alterar_consulta();
+                            break;
+                        case 3:
+                            excluir_consulta();
+                            break;
+                        case 4:
+                            pesquisar_consulta();
+                            break;
+                        case 5:
+                            loop = 0;
+                            break;
+                    }
                 }
             break;
 
             case 2:
-                switch (subMenu("Paciente")) {
-                    case 1:
-                       incluir_paciente();
-                        break;
-                    case 2:
-                       alterar_paciente();
-                        break;
-                    case 3:
-                       excluir_paciente();
-                        break;
-                    case 4:
-                       pesquisar_paciente();
-                        break;
-                    case 5:
-                        break;
+                int loop = 1;
+                while (loop) {
+                    switch (subMenu("Paciente")) {
+                        case 1:
+                            incluir_paciente();
+                            break;
+                        case 2:
+                            alterar_paciente();
+                            break;
+                        case 3:
+                            excluir_paciente();
+                            break;
+                        case 4:
+                            pesquisar_paciente();
+                            break;
+                        case 5:
+                            loop = 0;
+                            break;
+                    }
                 }
             break;
 
             case 3:
-                switch (subMenu("Medico")) {
-                    case 1:
-                       incluir_medico(&medico, &tamMedico, &idMedico);
-                        break;
-                    case 2:
-                       alterar_medico(&medico, tamMedico);
-                        break;
-                    case 3:
-                       excluir_medico();
-                        break;
-                    case 4:
-                        pesquisar_medico(medico, tamMedico);
-                        break;
-                    case 5:
-                        break;
+                int loop = 1;
+                while (loop) {
+                    switch (subMenu("Medico")) {
+                        case 1:
+                            incluir_medico(&medico, &tamMedico, &idMedico);
+                            break;
+                        case 2:
+                            alterar_medico(&medico, tamMedico);
+                            break;
+                        case 3:
+                            excluir_medico();
+                            break;
+                        case 4:
+                            pesquisar_medico(medico, tamMedico);
+                            break;
+                        case 5:
+                            loop = 0;
+                            break;
+                    }
                 }
             break;
 
             case 4:
-                switch (subMenuRelatorios()) {
-                    case 1:
-                       listar_consulta_paciente();
-                        break;
-                    case 2:
-                       listar_consulta_medico();
-                        break;
-                    case 3:
-                       listar_paciente_especialidade();
-                        break;
-                    case 4:
-                        break;
+                int loop = 1;
+                while (loop) {
+                    switch (subMenuRelatorios()) {
+                        case 1:
+                            listar_consulta_paciente();
+                            break;
+                        case 2:
+                            listar_consulta_medico();
+                            break;
+                        case 3:
+                            listar_paciente_especialidade();
+                            break;
+                        case 4:
+                            loop = 0;
+                            break;
+                    }
                 }
             break;
 
@@ -136,6 +152,7 @@ int subMenuRelatorios() {
     printf("4 - Voltar\n");
     printf("digite a opcao desejada: ");
     scanf("%d", &subOpcao);
+    getchar();
     return subOpcao;
 }
 
