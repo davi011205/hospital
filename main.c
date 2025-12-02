@@ -5,6 +5,11 @@
 int subMenu();
 int subMenuRelatorios();
 
+typedef struct Medico {
+    int Id;
+    char nome[50];
+    char especialidade[50];
+} Medico;
 
 int main() {
     int opcao;
