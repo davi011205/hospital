@@ -159,7 +159,7 @@ int subMenuRelatorios() {
 void incluir_medico(Medico **medico, int *tamMedico, int *idMedico) {
     Medico *temp = realloc(*medico, (*tamMedico + 1) * sizeof(Medico));
     if(temp == NULL) {
-        printf("nao foi possivel incluir o medico, tente novamente.\n");
+        printf("\n--- nao foi possivel incluir o medico, tente novamente ---\n");
         return;
     }
     *medico = temp;
@@ -167,50 +167,50 @@ void incluir_medico(Medico **medico, int *tamMedico, int *idMedico) {
     (*idMedico)++;
     (*medico)[*tamMedico].ID = *idMedico;
 
-    printf("digite o nome do medico: ");
+    printf("\n--- digite o nome do medico: ");
     fgets((*medico)[*tamMedico].nome, 55, stdin);
     (*medico)[*tamMedico].nome[strcspn((*medico)[*tamMedico].nome, "\n")] = '\0';
 
-    printf("digite a especialidade do medico: ");
+    printf("--- digite a especialidade do medico: ");
     fgets((*medico)[*tamMedico].especialidade, 55, stdin);
     (*medico)[*tamMedico].especialidade[strcspn((*medico)[*tamMedico].especialidade, "\n")] = '\0';
 
     (*tamMedico)++;
-    printf("medico incluido com sucesso !\n");
+    printf("--- medico incluido com sucesso ---\n");
 }
 
 void pesquisar_medico(Medico *medico, int tamMedico) {
     char nome[55];
     int achado = 0;
     if(tamMedico == 0) {
-        printf("nao ha medicos cadastrados.\n");
+        printf("\n--- nao ha medicos cadastrados ---\n");
         return;
     }
 
-    printf("digite o nome do medico: ");
+    printf("\n--- digite o nome do medico que deseja encontrar: ");
     fgets(nome, 55, stdin);
     nome[strcspn(nome, "\n")] = '\0';
 
     for(int i = 0; i < tamMedico; i++) {
         if(!strcmp(medico[i].nome, nome)) {
             achado = 1;
-            printf("ID: %d | Nome: %s | Especialidade: %s\n", medico[i].ID, medico[i].nome, medico[i].especialidade);
+            printf("--- ID: %d | Nome: %s | Especialidade: %s\n", medico[i].ID, medico[i].nome, medico[i].especialidade);
         }
     }
 
     if(!achado) {
-        printf("nao ha nenhum(a) medico(a) com esse nome\n");
+        printf("\n--- nao ha nenhum(a) medico(a) com esse nome ---\n");
     }
-
+    printf("\n");
 }
 
 void listar_todos_medicos(Medico *medico, int tamMedico) {
     if(tamMedico == 0) {
-        printf("nao ha medicos cadastrados.\n");
+        printf("\n--- nao ha medicos cadastrados ---\n");
         return;
     }
 
-    printf("medicos cadastrados: \n");
+    printf("\n--- medicos cadastrados: \n");
     for(int i = 0; i < tamMedico; i++) {
         printf("ID: %d | Nome: %s | Especialidade: %s\n", medico[i].ID, medico[i].nome, medico[i].especialidade);
     }
@@ -220,33 +220,33 @@ void alterar_medico(Medico **medico, int tamMedico) {
     int idAlterar, achado = 0;
     listar_todos_medicos(*medico, tamMedico);
 
-    printf("digite o id referente ao medico que deseja alterar: ");
+    printf("\n--- digite o id referente ao medico que deseja alterar: ");
     scanf("%d", &idAlterar);
     getchar();
 
     for(int i = 0; i < tamMedico; i++) {
         if((*medico)[i].ID == idAlterar) {
             achado = 1;
-            printf("medico(a) selecionado(a):\n");
-            printf("ID: %d | Nome: %s | Especialidade: %s", (*medico)[i].ID, (*medico)[i].nome, (*medico)[i].especialidade);
+            printf("\n--- medico(a) selecionado(a):\n");
+            printf("--- ID: %d | Nome: %s | Especialidade: %s", (*medico)[i].ID, (*medico)[i].nome, (*medico)[i].especialidade);
 
             printf("\n--------Alterando--------\n");
 
-            printf("digite o novo nome: ");
+            printf("--- digite o novo nome: ");
             fgets((*medico)[i].nome, 55, stdin);
             (*medico)[i].nome[strcspn((*medico)[i].nome, "\n")] = '\0';
 
-            printf("digite a nova especialidade: ");
+            printf("--- digite a nova especialidade: ");
             fgets((*medico)[i].especialidade, 55, stdin);
             (*medico)[i].especialidade[strcspn((*medico)[i].especialidade, "\n")] = '\0';
 
-            printf("medico(a) alterado(a) com sucesso! Confira os novos dados:\n");
-            printf("ID: %d | Nome: %s | Especialidade: %s\n", (*medico)[i].ID, (*medico)[i].nome, (*medico)[i].especialidade);
+            printf("\n--- medico(a) alterado(a) com sucesso! Confira os novos dados:\n");
+            printf("--- ID: %d | Nome: %s | Especialidade: %s\n\n", (*medico)[i].ID, (*medico)[i].nome, (*medico)[i].especialidade);
             return;
         }
     }
 
     if(!achado) {
-        printf("nao ha nenhum(a) medico(a) referente ao ID %d\n", idAlterar);
+        printf("\n---nao ha nenhum(a) medico(a) referente ao ID %d---\n", idAlterar);
     }
 }
