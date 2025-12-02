@@ -123,6 +123,7 @@ int subMenu(char str[]) {
     printf("5 - Voltar\n");
     printf("digite a opcao desejada: ");
     scanf("%d", &subOpcao);
+    getchar();
     return subOpcao;
 }
 
