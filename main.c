@@ -322,3 +322,50 @@ void alterar_medico(Medico **medico, int tamMedico) {
         printf("\n--- medico alterado com sucesso ---\n");
     }
 }
+
+void excluir_medico(Medico **medico, int *tamMedico) {
+    FILE *fp = fopen(ARQ_MEDICO, "rb");
+    FILE *temp = fopen("temp.bin", "wb");
+    Medico aux;
+    int idExcluir, achado = 0;
+
+    if(fp == NULL || temp == NULL) {
+        printf("\n--- erro ao abrir arquivo ---\n");
+        return;
+    }
+
+    listar_todos_medicos(*medico, *tamMedico);
+
+    printf("\n--- digite o ID do medico que deseja excluir: ");
+    scanf("%d", &idExcluir);
+    getchar();
+
+    while(fread(&aux, sizeof(Medico), 1, fp) == 1) {
+        if(aux.ID == idExcluir) {
+            achado = 1;
+        } else {
+            fwrite(&aux, sizeof(Medico), 1, temp);
+        }
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if(!achado) {
+        printf("\n--- medico nao encontrado ---\n");
+        remove("temp.bin");
+        return;
+    }
+
+    remove(ARQ_MEDICO);
+    rename("temp.bin", ARQ_MEDICO);
+
+    free(*medico);
+    *medico = NULL;
+    *tamMedico = 0;
+    int idAux = 0;
+
+    carregar_medicos(medico, tamMedico, &idAux);
+
+    printf("\n--- medico excluido com sucesso ---\n");
+}
