@@ -2,8 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-int subMenu(char str[]);
-int subMenuRelatorios();
+#define ARQ_MEDICO "medicos.bin"
 
 typedef struct Medico {
     int ID;
@@ -11,15 +10,22 @@ typedef struct Medico {
     char especialidade[55];
 } Medico;
 
-void incluir_medico(Medico **Medico, int *tamMedico, int *idMedico);
-void pesquisar_medico(Medico *Medico, int tamMedico);
-void listar_todos_medicos(Medico *Medico, int tamMedico);
-void alterar_medico(Medico **Medico, int tamMedico);
+int subMenu(char str[]);
+int subMenuRelatorios();
+
+void carregar_medicos(Medico **medico, int *tamMedico, int *idMedico);
+void incluir_medico(Medico **medico, int *tamMedico, int *idMedico);
+void listar_todos_medicos(Medico *medico, int tamMedico);
+void pesquisar_medico(Medico *medico, int tamMedico);
+void alterar_medico(Medico **medico, int tamMedico);
+void excluir_medico(Medico **medico, int *tamMedico);
 
 int main() {
     int opcao;
     Medico *medico = NULL;
     int tamMedico = 0, idMedico = 0;
+
+    carregar_medicos(&medico, &tamMedico, &idMedico);
 
     do {
         printf("--- BEM VINDO AO SISTEMA HOSPITALAR ---\n");
@@ -90,7 +96,7 @@ int main() {
                             alterar_medico(&medico, tamMedico);
                             break;
                         case 3:
-                            excluir_medico();
+                            excluir_medico(&medico, &tamMedico);
                             break;
                         case 4:
                             pesquisar_medico(medico, tamMedico);
@@ -126,6 +132,7 @@ int main() {
         }
     } while(opcao != 5);
 
+    free(medico);
     return 0;
 }
 
@@ -156,97 +163,162 @@ int subMenuRelatorios() {
     return subOpcao;
 }
 
+void carregar_medicos(Medico **medico, int *tamMedico, int *idMedico) {
+    FILE *fp = fopen(ARQ_MEDICO, "rb");
+    Medico aux;
+
+    if(fp == NULL) {
+        return; // arquivo ainda não existe
+    }
+
+    *tamMedico = 0;
+    *idMedico = 0;
+
+    while(fread(&aux, sizeof(Medico), 1, fp) == 1) {
+        Medico *temp = realloc(*medico, (*tamMedico + 1) * sizeof(Medico));
+        if(temp == NULL) {
+            fclose(fp);
+            return;
+        }
+        *medico = temp;
+
+        (*medico)[*tamMedico] = aux;
+        (*tamMedico)++;
+
+        if(aux.ID > *idMedico)
+            *idMedico = aux.ID;
+    }
+
+    fclose(fp);
+}
+
+
 void incluir_medico(Medico **medico, int *tamMedico, int *idMedico) {
-    Medico *temp = realloc(*medico, (*tamMedico + 1) * sizeof(Medico));
-    if(temp == NULL) {
-        printf("\n--- nao foi possivel incluir o medico, tente novamente ---\n");
+    FILE *fp = fopen(ARQ_MEDICO, "ab");
+
+    if(fp == NULL) {
+        printf("\n--- erro ao abrir arquivo ---\n");
         return;
     }
-    *medico = temp;
+
+    Medico novo;
 
     (*idMedico)++;
-    (*medico)[*tamMedico].ID = *idMedico;
+    novo.ID = *idMedico;
 
     printf("\n--- digite o nome do medico: ");
-    fgets((*medico)[*tamMedico].nome, 55, stdin);
-    (*medico)[*tamMedico].nome[strcspn((*medico)[*tamMedico].nome, "\n")] = '\0';
+    fgets(novo.nome, 55, stdin);
+    novo.nome[strcspn(novo.nome, "\n")] = '\0';
 
     printf("--- digite a especialidade do medico: ");
-    fgets((*medico)[*tamMedico].especialidade, 55, stdin);
-    (*medico)[*tamMedico].especialidade[strcspn((*medico)[*tamMedico].especialidade, "\n")] = '\0';
+    fgets(novo.especialidade, 55, stdin);
+    novo.especialidade[strcspn(novo.especialidade, "\n")] = '\0';
 
+    fwrite(&novo, sizeof(Medico), 1, fp);
+    fclose(fp);
+
+    Medico *temp = realloc(*medico, (*tamMedico + 1) * sizeof(Medico));
+    if(temp == NULL) {
+        printf("\n--- erro de memoria ---\n");
+        return;
+    }
+
+    *medico = temp;
+    (*medico)[*tamMedico] = novo;
     (*tamMedico)++;
-    printf("--- medico incluido com sucesso ---\n");
+
+    printf("\n--- medico incluido com sucesso ---\n");
 }
 
 void pesquisar_medico(Medico *medico, int tamMedico) {
+    FILE *fp = fopen(ARQ_MEDICO, "rb");
+    Medico aux;
+    
     char nome[55];
     int achado = 0;
-    if(tamMedico == 0) {
+
+    if(fp == NULL) {
         printf("\n--- nao ha medicos cadastrados ---\n");
         return;
     }
 
-    printf("\n--- digite o nome do medico que deseja encontrar: ");
+    printf("\n--- digite o nome do medico: ");
     fgets(nome, 55, stdin);
     nome[strcspn(nome, "\n")] = '\0';
 
-    for(int i = 0; i < tamMedico; i++) {
-        if(!strcmp(medico[i].nome, nome)) {
+    while(fread(&aux, sizeof(Medico), 1, fp) == 1) {
+        if(strcmp(aux.nome, nome) == 0) {
+            printf("--- ID: %d | Nome: %s | Especialidade: %s\n", aux.ID, aux.nome, aux.especialidade);
             achado = 1;
-            printf("--- ID: %d | Nome: %s | Especialidade: %s\n", medico[i].ID, medico[i].nome, medico[i].especialidade);
         }
     }
 
+    fclose(fp);
+
     if(!achado) {
-        printf("\n--- nao ha nenhum(a) medico(a) com esse nome ---\n");
+        printf("\n--- medico nao encontrado ---\n");
     }
-    printf("\n");
 }
 
 void listar_todos_medicos(Medico *medico, int tamMedico) {
-    if(tamMedico == 0) {
+    FILE *fp = fopen(ARQ_MEDICO, "rb");
+    Medico aux;
+
+    if(fp == NULL) {
         printf("\n--- nao ha medicos cadastrados ---\n");
         return;
     }
 
     printf("\n--- medicos cadastrados: \n");
-    for(int i = 0; i < tamMedico; i++) {
-        printf("ID: %d | Nome: %s | Especialidade: %s\n", medico[i].ID, medico[i].nome, medico[i].especialidade);
+    while(fread(&aux, sizeof(Medico), 1, fp) == 1) {
+        printf("ID: %d | Nome: %s | Especialidade: %s\n", aux.ID, aux.nome, aux.especialidade);
     }
+
+    fclose(fp);
 }
 
+
 void alterar_medico(Medico **medico, int tamMedico) {
+    FILE *fp = fopen(ARQ_MEDICO, "rb+");
+    Medico aux;
+
     int idAlterar, achado = 0;
+
+    if(fp == NULL) {
+        printf("\n--- erro ao abrir arquivo ---\n");
+        return;
+    }
+
     listar_todos_medicos(*medico, tamMedico);
 
-    printf("\n--- digite o id referente ao medico que deseja alterar: ");
+    printf("\n--- digite o ID do medico que deseja alterar: ");
     scanf("%d", &idAlterar);
     getchar();
 
-    for(int i = 0; i < tamMedico; i++) {
-        if((*medico)[i].ID == idAlterar) {
+    while(fread(&aux, sizeof(Medico), 1, fp) == 1) {
+        if(aux.ID == idAlterar) {
             achado = 1;
-            printf("\n--- medico(a) selecionado(a):\n");
-            printf("--- ID: %d | Nome: %s | Especialidade: %s", (*medico)[i].ID, (*medico)[i].nome, (*medico)[i].especialidade);
 
-            printf("\n--------Alterando--------\n");
-
-            printf("--- digite o novo nome: ");
-            fgets((*medico)[i].nome, 55, stdin);
-            (*medico)[i].nome[strcspn((*medico)[i].nome, "\n")] = '\0';
+            printf("\n--- digite o novo nome: ");
+            fgets(aux.nome, 55, stdin);
+            aux.nome[strcspn(aux.nome, "\n")] = '\0';
 
             printf("--- digite a nova especialidade: ");
-            fgets((*medico)[i].especialidade, 55, stdin);
-            (*medico)[i].especialidade[strcspn((*medico)[i].especialidade, "\n")] = '\0';
+            fgets(aux.especialidade, 55, stdin);
+            aux.especialidade[strcspn(aux.especialidade, "\n")] = '\0';
 
-            printf("\n--- medico(a) alterado(a) com sucesso! Confira os novos dados:\n");
-            printf("--- ID: %d | Nome: %s | Especialidade: %s\n\n", (*medico)[i].ID, (*medico)[i].nome, (*medico)[i].especialidade);
-            return;
+            fseek(fp, -sizeof(Medico), SEEK_CUR);
+            fwrite(&aux, sizeof(Medico), 1, fp);
+            break;
         }
     }
 
+    fclose(fp);
+
     if(!achado) {
-        printf("\n---nao ha nenhum(a) medico(a) referente ao ID %d---\n", idAlterar);
+        printf("\n--- medico nao encontrado ---\n");
+    } else {
+        carregar_medicos(medico, &tamMedico, &(int){0});
+        printf("\n--- medico alterado com sucesso ---\n");
     }
 }
