@@ -4,6 +4,7 @@
 
 #define ARQ_MEDICO "medicos.bin"
 #define ARQ_PACIENTE "pacientes.bin"
+#define ARQ_CONSULTA "consultas.bin"
 
 typedef struct Medico {
     int ID;
@@ -19,6 +20,15 @@ typedef struct Paciente {
     char telefone[20];
     char sexo[20]
 } Paciente;
+
+typedef struct Consulta {
+    int ID;
+    int idMedico;
+    int idPaciente;
+    char horario[10];
+    char data[15];
+    char duracao[10];
+} Consulta;
 
 int subMenu(char str[]);
 int subMenuRelatorios();
@@ -345,9 +355,33 @@ void alterar_medico(Medico **medico, int tamMedico) {
     }
 }
 
+void excluir_consultas_por_medico(int idMedico) {
+    FILE *fp = fopen(ARQ_CONSULTA, "rb");
+    FILE *temp = fopen("temp_consulta.bin", "wb");
+    Consulta aux;
+
+    if(fp == NULL || temp == NULL) {
+        if(fp) fclose(fp);
+        if(temp) fclose(temp);
+        return;
+    }
+
+    while(fread(&aux, sizeof(Consulta), 1, fp) == 1) {
+        if(aux.idMedico != idMedico) {
+            fwrite(&aux, sizeof(Consulta), 1, temp);
+        }
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    remove(ARQ_CONSULTA);
+    rename("temp_consulta.bin", ARQ_CONSULTA);
+}
+
 void excluir_medico(Medico **medico, int *tamMedico) {
     FILE *fp = fopen(ARQ_MEDICO, "rb");
-    FILE *temp = fopen("temp.bin", "wb");
+    FILE *temp = fopen("temp_medico.bin", "wb");
     Medico aux;
     int idExcluir, achado = 0;
 
@@ -375,12 +409,13 @@ void excluir_medico(Medico **medico, int *tamMedico) {
 
     if(!achado) {
         printf("\n--- medico nao encontrado ---\n");
-        remove("temp.bin");
+        remove("temp_medico.bin");
         return;
     }
 
+    excluir_consultas_por_medico(idExcluir);
     remove(ARQ_MEDICO);
-    rename("temp.bin", ARQ_MEDICO);
+    rename("temp_medico.bin", ARQ_MEDICO);
 
     free(*medico);
     *medico = NULL;
@@ -598,3 +633,4 @@ void excluir_paciente(Paciente **paciente, int *tamPaciente) {
 
     printf("\n--- paciente excluido com sucesso ---\n");
 }
+
