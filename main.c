@@ -3,12 +3,22 @@
 #include <stdlib.h>
 
 #define ARQ_MEDICO "medicos.bin"
+#define ARQ_PACIENTE "pacientes.bin"
 
 typedef struct Medico {
     int ID;
     char nome[55];
     char especialidade[55];
 } Medico;
+
+typedef struct Paciente {
+    int ID;
+    char nome[55];
+    char identidade[20];
+    char endereco[100];
+    char telefone[20];
+    char sexo[20]
+} Paciente;
 
 int subMenu(char str[]);
 int subMenuRelatorios();
@@ -20,12 +30,24 @@ void pesquisar_medico(Medico *medico, int tamMedico);
 void alterar_medico(Medico **medico, int tamMedico);
 void excluir_medico(Medico **medico, int *tamMedico);
 
+void carregar_pacientes(Paciente **paciente, int *tamPaciente, int *idPaciente);
+void incluir_paciente(Paciente **paciente, int *tamPaciente, int *idPaciente);
+void listar_todos_pacientes(Paciente *paciente, int tamPaciente);
+void pesquisar_paciente(Paciente *paciente, int tamPaciente);
+void alterar_paciente(Paciente **paciente, int tamPaciente);
+void excluir_paciente(Paciente **paciente, int *tamPaciente);
+
+
 int main() {
     int opcao;
     Medico *medico = NULL;
     int tamMedico = 0, idMedico = 0;
 
+    Paciente *paciente = NULL;
+    int tamPaciente = 0, idPaciente = 0;
+
     carregar_medicos(&medico, &tamMedico, &idMedico);
+    carregar_pacientes(&paciente, &tamPaciente, &idPaciente);
 
     do {
         printf("--- BEM VINDO AO SISTEMA HOSPITALAR ---\n");
@@ -67,16 +89,16 @@ int main() {
                 while (loop) {
                     switch (subMenu("Paciente")) {
                         case 1:
-                            incluir_paciente();
+                            incluir_paciente(&paciente, &tamPaciente, &idPaciente);
                             break;
                         case 2:
-                            alterar_paciente();
+                            alterar_paciente(&paciente, tamPaciente);
                             break;
                         case 3:
-                            excluir_paciente();
+                            excluir_paciente(&paciente, &tamPaciente);
                             break;
                         case 4:
-                            pesquisar_paciente();
+                            pesquisar_paciente(paciente, tamPaciente);
                             break;
                         case 5:
                             loop = 0;
@@ -368,4 +390,80 @@ void excluir_medico(Medico **medico, int *tamMedico) {
     carregar_medicos(medico, tamMedico, &idAux);
 
     printf("\n--- medico excluido com sucesso ---\n");
+}
+
+//pacientes
+void carregar_pacientes(Paciente **paciente, int *tamPaciente, int *idPaciente) {
+    FILE *fp = fopen(ARQ_PACIENTE, "rb");
+    Paciente aux;
+
+    if(fp == NULL) return;
+
+    *tamPaciente = 0;
+    *idPaciente = 0;
+
+    while(fread(&aux, sizeof(Paciente), 1, fp) == 1) {
+        Paciente *temp = realloc(*paciente, (*tamPaciente + 1) * sizeof(Paciente));
+        if(temp == NULL) {
+            fclose(fp);
+            return;
+        }
+        *paciente = temp;
+
+        (*paciente)[*tamPaciente] = aux;
+        (*tamPaciente)++;
+
+        if(aux.ID > *idPaciente)
+            *idPaciente = aux.ID;
+    }
+
+    fclose(fp);
+}
+
+void incluir_paciente(Paciente **paciente, int *tamPaciente, int *idPaciente) {
+    FILE *fp = fopen(ARQ_PACIENTE, "ab");
+    Paciente novo;
+
+    if(fp == NULL) {
+        printf("\n--- erro ao abrir arquivo ---\n");
+        return;
+    }
+
+    (*idPaciente)++;
+    novo.ID = *idPaciente;
+
+    printf("\n--- digite o nome do paciente: ");
+    fgets(novo.nome, 55, stdin);
+    novo.nome[strcspn(novo.nome, "\n")] = '\0';
+
+    printf("--- digite a identidade: ");
+    fgets(novo.identidade, 20, stdin);
+    novo.identidade[strcspn(novo.identidade, "\n")] = '\0';
+
+    printf("--- digite o endereco: ");
+    fgets(novo.endereco, 100, stdin);
+    novo.endereco[strcspn(novo.endereco, "\n")] = '\0';
+
+    printf("--- digite o telefone: ");
+    fgets(novo.telefone, 20, stdin);
+    novo.telefone[strcspn(novo.telefone, "\n")] = '\0';
+
+    printf("--- digite o sexo: ");
+    fgets(novo.sexo, 20, stdin);
+    novo.sexo[strcspn(novo.sexo, "\n")] = '\0';
+
+    fwrite(&novo, sizeof(Paciente), 1, fp);
+    fclose(fp);
+
+    Paciente *temp = realloc(*paciente, (*tamPaciente + 1) * sizeof(Paciente));
+    if(temp == NULL) {
+        printf("\n--- erro de memoria ---\n");
+        return;
+    }
+
+    *paciente = temp;
+    (*paciente)[*tamPaciente] = novo;
+    (*tamPaciente)++;
+
+    printf("\n--- paciente incluído com sucesso ---\n");
 }
