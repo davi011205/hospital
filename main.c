@@ -467,3 +467,87 @@ void incluir_paciente(Paciente **paciente, int *tamPaciente, int *idPaciente) {
 
     printf("\n--- paciente incluído com sucesso ---\n");
 }
+
+void pesquisar_paciente(Paciente *paciente, int tamPaciente) {
+    FILE *fp = fopen(ARQ_PACIENTE, "rb");
+    Paciente aux;
+    char nome[55];
+    int achado = 0;
+
+    if(fp == NULL) {
+        printf("\n--- nao ha pacientes cadastrados ---\n");
+        return;
+    }
+
+    printf("\n--- digite o nome do paciente: ");
+    fgets(nome, 55, stdin);
+    nome[strcspn(nome, "\n")] = '\0';
+
+    while(fread(&aux, sizeof(Paciente), 1, fp) == 1) {
+        if(strcmp(aux.nome, nome) == 0) {
+            printf("ID: %d | Nome: %s | Identidade: %s | Endereco: %s | Telefone: %s | Sexo: %s\n",
+                aux.ID, aux.nome, aux.identidade, aux.endereco, aux.telefone, aux.sexo);
+            achado = 1;
+        }
+    }
+
+    fclose(fp);
+
+    if(!achado) {
+        printf("\n--- paciente nao encontrado ---\n");
+    }
+}
+
+void alterar_paciente(Paciente **paciente, int tamPaciente) {
+    FILE *fp = fopen(ARQ_PACIENTE, "rb+");
+    Paciente aux;
+    int idAlterar, achado = 0;
+
+    if(fp == NULL) {
+        printf("\n--- erro ao abrir arquivo ---\n");
+        return;
+    }
+
+    listar_todos_pacientes(*paciente, tamPaciente);
+
+    printf("\n--- digite o ID do paciente que deseja alterar: ");
+    scanf("%d", &idAlterar);
+    getchar();
+
+    while(fread(&aux, sizeof(Paciente), 1, fp) == 1) {
+        if(aux.ID == idAlterar) {
+            achado = 1;
+
+            printf("\n--- digite o novo nome: ");
+            fgets(aux.nome, 55, stdin);
+            aux.nome[strcspn(aux.nome, "\n")] = '\0';
+
+            printf("--- digite a nova identidade: ");
+            fgets(aux.identidade, 20, stdin);
+            aux.identidade[strcspn(aux.identidade, "\n")] = '\0';
+
+            printf("--- digite o novo endereco: ");
+            fgets(aux.endereco, 100, stdin);
+            aux.endereco[strcspn(aux.endereco, "\n")] = '\0';
+
+            printf("--- digite o novo telefone: ");
+            fgets(aux.telefone, 20, stdin);
+            aux.telefone[strcspn(aux.telefone, "\n")] = '\0';
+
+            printf("--- digite o novo sexo: ");
+            fgets(aux.sexo, 20, stdin);
+            aux.sexo[strcspn(aux.sexo, "\n")] = '\0';
+
+            fseek(fp, -sizeof(Paciente), SEEK_CUR);
+            fwrite(&aux, sizeof(Paciente), 1, fp);
+            break;
+        }
+    }
+
+    fclose(fp);
+
+    if(!achado)
+        printf("\n--- paciente nao encontrado ---\n");
+    else
+        printf("\n--- paciente alterado com sucesso ---\n");
+}
