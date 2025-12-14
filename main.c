@@ -551,3 +551,50 @@ void alterar_paciente(Paciente **paciente, int tamPaciente) {
     else
         printf("\n--- paciente alterado com sucesso ---\n");
 }
+
+void excluir_paciente(Paciente **paciente, int *tamPaciente) {
+    FILE *fp = fopen(ARQ_PACIENTE, "rb");
+    FILE *temp = fopen("temp_paciente.bin", "wb");
+    Paciente aux;
+    int idExcluir, achado = 0;
+
+    if(fp == NULL || temp == NULL) {
+        printf("\n--- erro ao abrir arquivo ---\n");
+        return;
+    }
+
+    listar_todos_pacientes(*paciente, *tamPaciente);
+
+    printf("\n--- digite o ID do paciente que deseja excluir: ");
+    scanf("%d", &idExcluir);
+    getchar();
+
+    while(fread(&aux, sizeof(Paciente), 1, fp) == 1) {
+        if(aux.ID == idExcluir) {
+            achado = 1;
+        } else {
+            fwrite(&aux, sizeof(Paciente), 1, temp);
+        }
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    if(!achado) {
+        printf("\n--- paciente nao encontrado ---\n");
+        remove("temp_paciente.bin");
+        return;
+    }
+
+    remove(ARQ_PACIENTE);
+    rename("temp_paciente.bin", ARQ_PACIENTE);
+
+    free(*paciente);
+    *paciente = NULL;
+    *tamPaciente = 0;
+    int idAux = 0;
+
+    carregar_pacientes(paciente, tamPaciente, &idAux);
+
+    printf("\n--- paciente excluido com sucesso ---\n");
+}
