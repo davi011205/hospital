@@ -18,7 +18,7 @@ typedef struct Paciente {
     char identidade[20];
     char endereco[100];
     char telefone[20];
-    char sexo[20]
+    char sexo[20];
 } Paciente;
 
 typedef struct Consulta {
@@ -88,6 +88,9 @@ int main() {
                             pesquisar_consulta();
                             break;
                         case 5:
+                            listar_todas_consultas();
+                            break;
+                        case 6:
                             loop = 0;
                             break;
                     }
@@ -95,7 +98,7 @@ int main() {
             break;
 
             case 2:
-                int loop = 1;
+                loop = 1;
                 while (loop) {
                     switch (subMenu("Paciente")) {
                         case 1:
@@ -111,6 +114,9 @@ int main() {
                             pesquisar_paciente(paciente, tamPaciente);
                             break;
                         case 5:
+                            listar_todos_pacientes(paciente, tamPaciente);
+                            break;
+                        case 6:
                             loop = 0;
                             break;
                     }
@@ -118,7 +124,7 @@ int main() {
             break;
 
             case 3:
-                int loop = 1;
+                loop = 1;
                 while (loop) {
                     switch (subMenu("Medico")) {
                         case 1:
@@ -134,6 +140,9 @@ int main() {
                             pesquisar_medico(medico, tamMedico);
                             break;
                         case 5:
+                            listar_todos_medicos(paciente, tamPaciente);
+                            break;
+                        case 6:
                             loop = 0;
                             break;
                     }
@@ -141,7 +150,7 @@ int main() {
             break;
 
             case 4:
-                int loop = 1;
+                loop = 1;
                 while (loop) {
                     switch (subMenuRelatorios()) {
                         case 1:
@@ -175,7 +184,8 @@ int subMenu(char str[]) {
     printf("2 - Alterar %s\n", str);
     printf("3 - Excluir %s\n", str);
     printf("4 - Pesquisar %s\n", str);
-    printf("5 - Voltar\n");
+    printf("5 - Listar %s\n", str);
+    printf("6 - Voltar\n");
     printf("digite a opcao desejada: ");
     scanf("%d", &subOpcao);
     getchar();
@@ -531,6 +541,24 @@ void pesquisar_paciente(Paciente *paciente, int tamPaciente) {
     if(!achado) {
         printf("\n--- paciente nao encontrado ---\n");
     }
+}
+
+void listar_todos_pacientes(Paciente *paciente, int tamPaciente) {
+    FILE *fp = fopen(ARQ_PACIENTE, "rb");
+    Paciente aux;
+
+    if(fp == NULL) {
+        printf("\n--- nao ha pacientes cadastrados ---\n");
+        return;
+    }
+
+    printf("\n--- pacientes cadastrados ---\n");
+    while(fread(&aux, sizeof(Paciente), 1, fp) == 1) {
+        printf("ID: %d | Nome: %s | Identidade: %s | Endereco: %s | Telefone: %s | Sexo: %s\n",
+            aux.ID, aux.nome, aux.identidade, aux.endereco, aux.telefone, aux.sexo);
+    }
+
+    fclose(fp);
 }
 
 void alterar_paciente(Paciente **paciente, int tamPaciente) {
