@@ -229,7 +229,7 @@ void carregar_medicos(Medico **medico, int *tamMedico, int *idMedico) {
     Medico aux;
 
     if(fp == NULL) {
-        return; // arquivo ainda não existe
+        return; 
     }
 
     *tamMedico = 0;
@@ -458,7 +458,7 @@ void excluir_medico(Medico **medico, int *tamMedico) {
     printf("\n--- medico excluido com sucesso ---\n");
 }
 
-//pacientes
+
 void carregar_pacientes(Paciente **paciente, int *tamPaciente, int *idPaciente) {
     FILE *fp = fopen(ARQ_PACIENTE, "rb");
     Paciente aux;
@@ -1021,7 +1021,7 @@ void listar_consulta_paciente(Consulta *consulta, int tamConsulta, Paciente *pac
     printf("%-5s | %-12s | %-8s | %-10s | %-10s\n", "ID", "Data", "Hora", "Duracao", "ID Medico");
     printf("-----------------------------------------------------------\n");
 
-    // 2. Varrer consultas filtrando pelo ID do paciente
+
     for(int i = 0; i < tamConsulta; i++) {
         if(consulta[i].idPaciente == idBusca) {
             printf("%-5d | %-12s | %-8s | %-10s | %-10d\n", 
@@ -1051,7 +1051,7 @@ void listar_consulta_medico(Consulta *consulta, int tamConsulta, Medico *medico,
     scanf("%d", &idBusca);
     getchar();
 
-    // 1. Achar o nome do médico
+
     for(int i = 0; i < tamMedico; i++) {
         if(medico[i].ID == idBusca) {
             strcpy(nomeMedico, medico[i].nome);
@@ -1069,7 +1069,7 @@ void listar_consulta_medico(Consulta *consulta, int tamConsulta, Medico *medico,
     printf("%-5s | %-12s | %-8s | %-10s | %-10s\n", "ID", "Data", "Hora", "Duracao", "ID Paciente");
     printf("------------------------------------------------------------\n");
 
-    // 2. Varrer consultas filtrando pelo ID do médico
+
     for(int i = 0; i < tamConsulta; i++) {
         if(consulta[i].idMedico == idBusca) {
             printf("%-5d | %-12s | %-8s | %-10s | %-10d\n", 
