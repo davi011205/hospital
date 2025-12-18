@@ -640,6 +640,30 @@ void alterar_paciente(Paciente **paciente, int tamPaciente, int *idMaior) {
     }
 }
 
+void excluir_consultas_por_paciente(int idPaciente) {
+    FILE *fp = fopen(ARQ_CONSULTA, "rb");
+    FILE *temp = fopen("temp_consulta.bin", "wb");
+    Consulta aux;
+
+    if(fp == NULL || temp == NULL) {
+        if(fp) fclose(fp);
+        if(temp) fclose(temp);
+        return;
+    }
+
+    while(fread(&aux, sizeof(Consulta), 1, fp) == 1) {
+        if(aux.idPaciente != idPaciente) {
+            fwrite(&aux, sizeof(Consulta), 1, temp);
+        }
+    }
+
+    fclose(fp);
+    fclose(temp);
+
+    remove(ARQ_CONSULTA);
+    rename("temp_consulta.bin", ARQ_CONSULTA);
+}
+
 void excluir_paciente(Paciente **paciente, int *tamPaciente) {
     FILE *fp = fopen(ARQ_PACIENTE, "rb");
     FILE *temp = fopen("temp_paciente.bin", "wb");
@@ -674,6 +698,7 @@ void excluir_paciente(Paciente **paciente, int *tamPaciente) {
         return;
     }
 
+    excluir_consultas_por_paciente(idExcluir);
     remove(ARQ_PACIENTE);
     rename("temp_paciente.bin", ARQ_PACIENTE);
 
