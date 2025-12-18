@@ -27,7 +27,7 @@ typedef struct Consulta {
     int idPaciente;
     char horario[10];
     char data[15];
-    char duracao[10];
+    char duracao[30];
 } Consulta;
 
 int subMenu(char str[]);
@@ -83,7 +83,7 @@ int main() {
         printf("digite a opcao desejada: ");
         scanf("%d", &opcao);
         getchar();
-        
+
         switch(opcao) {
             case 1: ;
                 int loop = 1;
@@ -215,7 +215,7 @@ int subMenuRelatorios() {
     int subOpcao;
     printf("--- O que deseja fazer ---\n");
     printf("1 - Listar consultas agendadas para o paciente\n");
-    printf("2 - Listar consultas agendadas para o médico\n");
+    printf("2 - Listar consultas agendadas para o medico\n");
     printf("3 - Listar pacientes por especialidade\n");
     printf("4 - Voltar\n");
     printf("digite a opcao desejada: ");
@@ -294,7 +294,7 @@ void incluir_medico(Medico **medico, int *tamMedico, int *idMedico) {
 void pesquisar_medico(Medico *medico, int tamMedico) {
     FILE *fp = fopen(ARQ_MEDICO, "rb");
     Medico aux;
-    
+
     char nome[55];
     int achado = 0;
 
@@ -530,7 +530,7 @@ void incluir_paciente(Paciente **paciente, int *tamPaciente, int *idPaciente) {
     (*paciente)[*tamPaciente] = novo;
     (*tamPaciente)++;
 
-    printf("\n--- paciente incluído com sucesso ---\n");
+    printf("\n--- paciente incluido com sucesso ---\n");
 }
 
 void pesquisar_paciente(Paciente *paciente, int tamPaciente) {
@@ -808,7 +808,7 @@ void incluir_consulta(Consulta **consulta, int *tamConsulta, int *idConsulta, Me
     novo.horario[strcspn(novo.horario, "\n")] = '\0';
 
     printf("--- Digite a Duracao (ex: 30min): ");
-    fgets(novo.duracao, 10, stdin);
+    fgets(novo.duracao, 50, stdin);
     novo.duracao[strcspn(novo.duracao, "\n")] = '\0';
 
     fwrite(&novo, sizeof(Consulta), 1, fp);
@@ -991,7 +991,7 @@ void alterar_consulta(Consulta **consulta, int tamConsulta, int *idConsulta, Med
             aux.horario[strcspn(aux.horario, "\n")] = '\0';
 
             printf("Nova Duracao [Atual: %s]: ", aux.duracao);
-            fgets(aux.duracao, 10, stdin);
+            fgets(aux.duracao, 50, stdin);
             aux.duracao[strcspn(aux.duracao, "\n")] = '\0';
 
             fseek(fp, -(long)sizeof(Consulta), SEEK_CUR);
@@ -1120,13 +1120,9 @@ void listar_paciente_especialidade(Consulta *consulta, int tamConsulta, Medico *
     printf("--------------------------------------------------------------\n");
 
     for(int i = 0; i < tamConsulta; i++) {
-        
         for(int m = 0; m < tamMedico; m++) {
             if(consulta[i].idMedico == medico[m].ID) {
-                
                 if(strcmp(medico[m].especialidade, especialidadeBusca) == 0) {
-                    
-
                     for(int p = 0; p < tamPaciente; p++) {
                         if(consulta[i].idPaciente == paciente[p].ID) {
                             printf("%-5d | %-20s | %-15s | %-12s\n", 
